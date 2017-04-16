@@ -666,7 +666,7 @@ class MainWindowController: NSWindowController, NSWindowDelegate {
             playerCore.abLoop()
             returnValue = 0
           default:
-            returnValue = playerCore.mpvController.command(raw: kb.rawAction)
+            returnValue = playerCore.mpvController.command(rawString: kb.rawAction)
           }
           // handle return value, display osd if needed
           if returnValue == 0 {
