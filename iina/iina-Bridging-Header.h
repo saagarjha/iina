@@ -16,7 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol PIPViewControllerDelegate;
 
-@interface PIPViewController : NSViewController
+@interface PIPViewController : NSViewController {
+  bool _pipping;
+}
 
 @property (nonatomic, copy, nullable) NSString *name;
 @property (nonatomic, weak, nullable) id<PIPViewControllerDelegate> delegate;
