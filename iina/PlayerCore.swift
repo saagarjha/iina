@@ -580,11 +580,11 @@ class PlayerCore: NSObject {
       panel.addButton(withTitle: NSLocalizedString("alert.filter_hwdec.use_copy", comment: "Switch to Auto(Copy)"))
       panel.addButton(withTitle: NSLocalizedString("alert.filter_hwdec.abort", comment: "Abort"))
       switch panel.runModal() {
-      case NSAlertFirstButtonReturn:  // turn off
+      case .alertFirstButtonReturn:  // turn off
         self.mpvController.setString(MPVProperty.hwdec, "no")
         self.ud.set(Preference.HardwareDecoderOption.disabled.rawValue, forKey: Preference.Key.hardwareDecoder)
         return true
-      case NSAlertSecondButtonReturn:
+      case .alertSecondButtonReturn:
         self.mpvController.setString(MPVProperty.hwdec, "auto-copy")
         self.ud.set(Preference.HardwareDecoderOption.autoCopy.rawValue, forKey: Preference.Key.hardwareDecoder)
         return true
@@ -796,7 +796,7 @@ class PlayerCore: NSObject {
       let duration = info.videoDuration ?? .zero
       HistoryController.shared.add(url, duration: duration.second)
       if ud.bool(forKey: Preference.Key.recordRecentFiles) && ud.bool(forKey: Preference.Key.trackAllFilesInRecentOpenMenu) {
-        NSDocumentController.shared().noteNewRecentDocumentURL(url)
+        NSDocumentController.shared.noteNewRecentDocumentURL(url)
       }
     }
     NotificationCenter.default.post(Notification(name: Constants.Noti.fileLoaded))
@@ -854,7 +854,7 @@ class PlayerCore: NSObject {
     case playlist
   }
 
-  func syncUITime() {
+  @objc func syncUITime() {
     if info.isNetworkResource {
       syncUI(.timeAndCache)
     } else {
@@ -893,7 +893,7 @@ class PlayerCore: NSObject {
       let pause = mpvController.getFlag(MPVOption.PlaybackControl.pause)
       info.isPaused = pause
       DispatchQueue.main.async {
-        self.mainWindow.updatePlayButtonState(pause ? NSOffState : NSOnState)
+        self.mainWindow.updatePlayButtonState(pause ? .offState : .onState)
         if #available(OSX 10.12.2, *) {
           self.mainWindow.updateTouchBarPlayBtn()
         }
@@ -907,7 +907,7 @@ class PlayerCore: NSObject {
     case .muteButton:
       let mute = mpvController.getFlag(MPVOption.Audio.mute)
       DispatchQueue.main.async {
-        self.mainWindow.muteButton.state = mute ? NSOnState : NSOffState
+        self.mainWindow.muteButton.state = mute ? .onState : .offState
       }
 
     case .chapterList:

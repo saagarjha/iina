@@ -73,7 +73,7 @@ class MPVController: NSObject {
 
   deinit {
     ObjcUtils.silenced {
-      self.optionObservers.forEach { (k, v) in
+      self.optionObservers.forEach { (k, _) in
         self.ud.removeObserver(self, forKeyPath: k)
       }
     }

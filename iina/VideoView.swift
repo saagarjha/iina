@@ -50,15 +50,15 @@ class VideoView: NSView {
 
     // set up layer
     layer = videoLayer
-    videoLayer.contentsScale = NSScreen.main()!.backingScaleFactor
+    videoLayer.contentsScale = NSScreen.main!.backingScaleFactor
     wantsLayer = true
 
     // other settings
-    autoresizingMask = [.viewWidthSizable, .viewHeightSizable]
+    autoresizingMask = [.width, .height]
     wantsBestResolutionOpenGLSurface = true
   
     // dragging init
-    register(forDraggedTypes: [NSFilenamesPboardType, NSURLPboardType, NSPasteboardTypeString])
+    registerForDraggedTypes([NSFilenamesPboardType, NSURLPboardType, .string])
   }
 
   required init?(coder: NSCoder) {
@@ -141,8 +141,8 @@ class VideoView: NSView {
 
       playerCore.openURLString(url[0])
       return true
-    } else if types.contains(NSPasteboardTypeString) {
-      guard let droppedString = pb.pasteboardItems![0].string(forType: "public.utf8-plain-text") else {
+    } else if types.contains(.string) {
+      guard let droppedString = pb.pasteboardItems![0].string(forType: NSPasteboard.PasteboardType("public.utf8-plain-text")) else {
         return false
       }
       if Regex.urlDetect.matches(droppedString) {

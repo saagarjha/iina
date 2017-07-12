@@ -195,7 +195,7 @@ extension MainWindowController {
   }
 
   @IBAction func menuToggleDeinterlace(_ sender: NSMenuItem) {
-    playerCore.toggleDeinterlace(sender.state != NSOnState)
+    playerCore.toggleDeinterlace(sender.state != .onState)
   }
 
   @IBAction func menuChangeWindowSize(_ sender: NSMenuItem) {
@@ -214,7 +214,7 @@ extension MainWindowController {
     let useRetinaSize = ud.bool(forKey: Preference.Key.usePhysicalResolution)
     let logicalSize = NSRect(x: w.frame.origin.x, y: w.frame.origin.y, width: CGFloat(vw), height: CGFloat(vh))
     var retinaSize = useRetinaSize ? w.convertFromBacking(logicalSize) : logicalSize
-    let screenFrame = NSScreen.main()!.visibleFrame
+    let screenFrame = NSScreen.main!.visibleFrame
     let newFrame: NSRect
     let sizeMap: [CGFloat] = [0.5, 1, 2]
     let scaleStep: CGFloat = 25

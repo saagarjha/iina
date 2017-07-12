@@ -10,8 +10,8 @@ import Cocoa
 
 class FilterWindowController: NSWindowController {
 
-  override var windowNibName: String {
-    return "FilterWindowController"
+  override var windowNibName: NSNib.Name? {
+    return NSNib.Name("FilterWindowController")
   }
 
   var filterType: String!

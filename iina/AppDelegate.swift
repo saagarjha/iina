@@ -74,7 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // show alpha in color panels
-    NSColorPanel.shared().showsAlpha = true
+    NSColorPanel.shared.showsAlpha = true
 
     // other
     if #available(OSX 10.12.2, *) {
@@ -89,7 +89,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     Timer.scheduledTimer(timeInterval: TimeInterval(0.1), target: self, selector: #selector(self.checkForShowingInitialWindow), userInfo: nil, repeats: false)
 
-    NSApplication.shared().servicesProvider = self
+    NSApplication.shared.servicesProvider = self
   }
 
   @objc
@@ -125,7 +125,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return UserDefaults.standard.bool(forKey: Preference.Key.quitWhenNoOpenedWindow)
   }
 
-  func applicationShouldTerminate(_ sender: NSApplication) -> NSApplicationTerminateReply {
+  func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
     for pc in PlayerCore.playerCores {
      pc.terminateMPV()
     }
@@ -156,7 +156,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let url = URL(fileURLWithPath: filename)
     if UserDefaults.standard.bool(forKey: Preference.Key.recordRecentFiles) {
-      NSDocumentController.shared().noteNewRecentDocumentURL(url)
+      NSDocumentController.shared.noteNewRecentDocumentURL(url)
     }
     PlayerCore.activeOrNew.openURL(url, isNetworkResource: false)
     return true
@@ -165,7 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   // MARK: - Accept dropped string and URL
 
   func droppedText(_ pboard: NSPasteboard, userData:String, error: NSErrorPointer) {
-    if let url = pboard.string(forType: NSStringPboardType) {
+    if let url = pboard.string(forType: .string) {
       handledOpenFile = true
       PlayerCore.active.openURLString(url)
     }
@@ -180,7 +180,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   // MARK: - URL Scheme
 
-  func handleURLEvent(event: NSAppleEventDescriptor, withReplyEvent replyEvent: NSAppleEventDescriptor) {
+  @objc func handleURLEvent(event: NSAppleEventDescriptor, withReplyEvent replyEvent: NSAppleEventDescriptor) {
     handledOpenFile = true
     guard let url = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else { return }
     if isReady {
@@ -209,10 +209,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     panel.canChooseDirectories = false
     panel.resolvesAliases = true
     panel.allowsMultipleSelection = false
-    if panel.runModal() == NSFileHandlingPanelOKButton {
+    if panel.runModal() == .OK {
       if let url = panel.url {
         if UserDefaults.standard.bool(forKey: Preference.Key.recordRecentFiles) {
-          NSDocumentController.shared().noteNewRecentDocumentURL(url)
+          NSDocumentController.shared.noteNewRecentDocumentURL(url)
         }
         let isAlternative = (sender as? NSMenuItem)?.tag == alternativeMenuItemTag
         let playerCore = PlayerCore.activeOrNewForMenuAction(isAlternative: isAlternative)
@@ -231,7 +231,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     panel.addButton(withTitle: NSLocalizedString("general.cancel", comment: "Cancel"))
     panel.window.initialFirstResponder = inputViewController.urlField
     let response = panel.runModal()
-    if response == NSAlertFirstButtonReturn {
+    if response == .alertFirstButtonReturn {
       if let url = inputViewController.url {
         let playerCore = PlayerCore.activeOrNewForMenuAction(isAlternative: sender.tag == alternativeMenuItemTag)
         playerCore.openURL(url, isNetworkResource: true)
@@ -249,7 +249,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let screenshotPath = UserDefaults.standard.string(forKey: Preference.Key.screenshotFolder)!
     let absoluteScreenshotPath = NSString(string: screenshotPath).expandingTildeInPath
     let url = URL(fileURLWithPath: absoluteScreenshotPath, isDirectory: true)
-      NSWorkspace.shared().open(url)
+      NSWorkspace.shared.open(url)
   }
 
   @IBAction func menuSelectAudioDevice(_ sender: NSMenuItem) {
@@ -279,15 +279,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   @IBAction func helpAction(_ sender: AnyObject) {
-    NSWorkspace.shared().open(URL(string: AppData.wikiLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.wikiLink)!)
   }
 
   @IBAction func githubAction(_ sender: AnyObject) {
-    NSWorkspace.shared().open(URL(string: AppData.githubLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.githubLink)!)
   }
 
   @IBAction func websiteAction(_ sender: AnyObject) {
-    NSWorkspace.shared().open(URL(string: AppData.websiteLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.websiteLink)!)
   }
 
   @IBAction func setSelfAsDefaultAction(_ sender: AnyObject) {

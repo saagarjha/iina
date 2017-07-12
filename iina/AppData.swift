@@ -56,13 +56,13 @@ struct AppData {
 
 struct Constants {
   struct Identifier {
-    static let isChosen = "IsChosen"
-    static let trackName = "TrackName"
-    static let isPlayingCell = "IsPlayingCell"
-    static let trackNameCell = "TrackNameCell"
-    static let key = "Key"
-    static let value = "Value"
-    static let action = "Action"
+    static let isChosen = NSUserInterfaceItemIdentifier("IsChosen")
+    static let trackName = NSUserInterfaceItemIdentifier("TrackName")
+    static let isPlayingCell = NSUserInterfaceItemIdentifier("IsPlayingCell")
+    static let trackNameCell = NSUserInterfaceItemIdentifier("TrackNameCell")
+    static let key = NSUserInterfaceItemIdentifier("Key")
+    static let value = NSUserInterfaceItemIdentifier("Value")
+    static let action = NSUserInterfaceItemIdentifier("Action")
   }
   struct String {
     static let degree = "°"

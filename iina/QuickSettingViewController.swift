@@ -10,8 +10,8 @@ import Cocoa
 
 class QuickSettingViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, SidebarViewController {
 
-  override var nibName: String {
-    return "QuickSettingViewController"
+  override var nibName: NSNib.Name? {
+    return NSNib.Name("QuickSettingViewController")
   }
   
   let sliderSteps = 24.0
@@ -46,7 +46,7 @@ class QuickSettingViewController: NSViewController, NSTableViewDataSource, NSTab
   @IBOutlet weak var tabView: NSTabView!
 
   @IBOutlet weak var buttonTopConstraint: NSLayoutConstraint!
-	
+  
   @IBOutlet weak var videoTableView: NSTableView!
   @IBOutlet weak var audioTableView: NSTableView!
   @IBOutlet weak var subTableView: NSTableView!
@@ -75,14 +75,14 @@ class QuickSettingViewController: NSViewController, NSTableViewDataSource, NSTab
   @IBOutlet weak var audioDelaySliderIndicator: NSTextField!
   @IBOutlet weak var audioDelaySliderConstraint: NSLayoutConstraint!
   @IBOutlet weak var customAudioDelayTextField: NSTextField!
-	
-	
+  
+  
   @IBOutlet weak var subLoadSementedControl: NSSegmentedControl!
   @IBOutlet weak var subDelaySlider: NSSlider!
   @IBOutlet weak var subDelaySliderIndicator: NSTextField!
   @IBOutlet weak var subDelaySliderConstraint: NSLayoutConstraint!
   @IBOutlet weak var customSubDelayTextField: NSTextField!
-	
+  
   @IBOutlet weak var audioEqSlider1: NSSlider!
   @IBOutlet weak var audioEqSlider2: NSSlider!
   @IBOutlet weak var audioEqSlider3: NSSlider!
@@ -128,7 +128,7 @@ class QuickSettingViewController: NSViewController, NSTableViewDataSource, NSTab
     // notifications
     let tracklistChangeObserver = NotificationCenter.default.addObserver(forName: Constants.Noti.tracklistChanged, object: nil, queue: OperationQueue.main) { _ in
       self.playerCore.getTrackInfo()
-      self.withAllTableViews { $0.0.reloadData() }
+      self.withAllTableViews { tableView, _ in tableView.reloadData() }
     }
     observers.append(tracklistChangeObserver)
     let afChangeObserver = NotificationCenter.default.addObserver(forName: Constants.Noti.afChanged, object: nil, queue: OperationQueue.main) { _ in
@@ -161,7 +161,7 @@ class QuickSettingViewController: NSViewController, NSTableViewDataSource, NSTab
       cropSegment.selectedSegment = index
     }
     rotateSegment.selectSegment(withTag: AppData.rotations.index(of: playerCore.info.rotation) ?? -1)
-    deinterlaceCheckBtn.state = playerCore.info.deinterlace ? NSOnState : NSOffState
+    deinterlaceCheckBtn.state = playerCore.info.deinterlace ? .onState : .offState
     let speed = playerCore.mpvController.getDouble(MPVOption.PlaybackControl.speed)
     customSpeedTextField.doubleValue = speed
     let sliderValue = log(speed / AppData.minSpeed) / log(AppData.maxSpeed / AppData.minSpeed) * sliderSteps
@@ -339,7 +339,7 @@ class QuickSettingViewController: NSViewController, NSTableViewDataSource, NSTab
     updateControlsState()
   }
 
-  private func withAllTableViews (_ block: (NSTableView, MPVTrack.TrackType) -> Void) {
+  private func withAllTableViews(_ block: (NSTableView, MPVTrack.TrackType) -> Void) {
     block(audioTableView, .audio)
     block(subTableView, .sub)
     block(secSubTableView, .secondSub)
@@ -444,7 +444,7 @@ class QuickSettingViewController: NSViewController, NSTableViewDataSource, NSTab
   }
 
   @IBAction func deinterlaceBtnAction(_ sender: AnyObject) {
-    playerCore.toggleDeinterlace(deinterlaceCheckBtn.state == NSOnState)
+    playerCore.toggleDeinterlace(deinterlaceCheckBtn.state == .onState)
   }
 
   @IBAction func equalizerSliderAction(_ sender: NSSlider) {

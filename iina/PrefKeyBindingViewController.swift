@@ -11,24 +11,24 @@ import MASPreferences
 
 class PrefKeyBindingViewController: NSViewController, MASPreferencesViewController {
 
-  override var nibName: String? {
-    return "PrefKeyBindingViewController"
+  override var nibName: NSNib.Name? {
+    return NSNib.Name("PrefKeyBindingViewController")
   }
 
-  override var identifier: String? {
+  override var identifier: NSUserInterfaceItemIdentifier? {
     get {
-      return "keybinding"
+      return NSUserInterfaceItemIdentifier("keybinding")
     }
     set {
       super.identifier = newValue
     }
   }
 
-  var toolbarItemImage: NSImage {
-    return NSImage(named: "toolbar_key")!
+  var toolbarItemImage: NSImage? {
+    return NSImage(named: NSImage.Name(rawValue: "toolbar_key"))!
   }
 
-  var toolbarItemLabel: String {
+  var toolbarItemLabel: String? {
     view.layoutSubtreeIfNeeded()
     return NSLocalizedString("preference.keybindings", comment: "Keybindings")
   }
@@ -72,8 +72,8 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
 
     // config files
     // - default
-    PrefKeyBindingViewController.defaultConfigs.forEach { (k, v) in
-      configSelectPopUp.addItem(withTitle: k)
+    PrefKeyBindingViewController.defaultConfigs.forEach {
+      configSelectPopUp.addItem(withTitle: $0.key)
     }
     // - user
     guard let uc = UserDefaults.standard.dictionary(forKey: Preference.Key.inputConfigs)
@@ -81,8 +81,8 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
       Utility.fatal("Cannot get config file list!")
     }
     userConfigs = uc
-    userConfigs.forEach { (k, v) in
-      configSelectPopUp.addItem(withTitle: k)
+    userConfigs.forEach {
+      configSelectPopUp.addItem(withTitle: $0.key)
     }
 
     var currentConf = ""
@@ -119,7 +119,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
     panel.window.initialFirstResponder = keyRecordViewController.keyRecordView
     panel.addButton(withTitle: NSLocalizedString("general.ok", comment: "OK"))
     panel.addButton(withTitle: NSLocalizedString("general.cancel", comment: "Cancel"))
-    if panel.runModal() == NSAlertFirstButtonReturn {
+    if panel.runModal() == .alertFirstButtonReturn {
       ok(keyRecordViewController.keyCode, keyRecordViewController.action)
     }
   }
@@ -187,7 +187,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
           return
         }
       } else {
-        NSWorkspace.shared().activateFileViewerSelecting([URL(fileURLWithPath: newFilePath)])
+        NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: newFilePath)])
         return
       }
     }
@@ -234,7 +234,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
           return
         }
       } else {
-        NSWorkspace.shared().activateFileViewerSelecting([URL(fileURLWithPath: newFilePath)])
+        NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: newFilePath)])
         return
       }
     }
@@ -259,7 +259,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
 
   @IBAction func revealConfFileAction(_ sender: AnyObject) {
     let url = URL(fileURLWithPath: currentConfFilePath)
-    NSWorkspace.shared().activateFileViewerSelecting([url])
+    NSWorkspace.shared.activateFileViewerSelecting([url])
   }
 
   @IBAction func deleteConfFileAction(_ sender: AnyObject) {
@@ -279,7 +279,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
   }
 
   @IBAction func displayRawValueAction(_ sender: NSButton) {
-    displayRawValues = sender.state == NSOnState
+    displayRawValues = sender.state == .onState
     kbTableView.doubleAction = displayRawValues ? nil : #selector(editRow)
     kbTableView.reloadData()
   }
@@ -386,7 +386,7 @@ extension PrefKeyBindingViewController: NSTableViewDelegate, NSTableViewDataSour
     return displayRawValues
   }
 
-  func editRow() {
+  @objc func editRow() {
     guard shouldEnableEdit else { return }
     let selectedData = currentMapping[kbTableView.selectedRow]
     showKeyBindingPanel(key: selectedData.key, action: selectedData.readableAction) { key, action in

@@ -10,8 +10,8 @@ import Cocoa
 
 class InitialWindowController: NSWindowController {
 
-  override var windowNibName: String {
-    return "InitialWindowController"
+  override var windowNibName: NSNib.Name? {
+    return NSNib.Name("InitialWindowController")
   }
 
   weak var playerCore: PlayerCore!
@@ -23,7 +23,7 @@ class InitialWindowController: NSWindowController {
   @IBOutlet weak var visualEffectView: NSVisualEffectView!
   @IBOutlet weak var mainView: NSView!
 
-  lazy var recentDocuments: [URL] = NSDocumentController.shared().recentDocumentURLs
+  lazy var recentDocuments: [URL] = NSDocumentController.shared.recentDocumentURLs
 
   init(playerCore: PlayerCore) {
     self.playerCore = playerCore
@@ -36,11 +36,11 @@ class InitialWindowController: NSWindowController {
 
   override func windowDidLoad() {
     super.windowDidLoad()
-    window?.appearance = NSAppearance(named: NSAppearanceNameVibrantDark)
+    window?.appearance = NSAppearance(named: .vibrantDark)
     window?.titlebarAppearsTransparent = true
     window?.isMovableByWindowBackground = true
 
-    window?.contentView?.register(forDraggedTypes: [NSFilenamesPboardType, NSURLPboardType, NSPasteboardTypeString])
+    window?.contentView?.registerForDraggedTypes([NSFilenamesPboardType, NSURLPboardType, .string])
 
     mainView.wantsLayer = true
     mainView.layer?.backgroundColor = CGColor(gray: 0.1, alpha: 1)
@@ -71,7 +71,7 @@ extension InitialWindowController: NSTableViewDelegate, NSTableViewDataSource {
     let url = recentDocuments[row]
     return [
       "filename": url.lastPathComponent,
-      "docIcon": NSWorkspace.shared().icon(forFile: url.path)
+      "docIcon": NSWorkspace.shared.icon(forFile: url.path)
     ]
   }
 
@@ -143,8 +143,8 @@ class InitialWindowContentView: NSView {
 
       playerCore.openURLString(url[0])
       return true
-    } else if types.contains(NSPasteboardTypeString) {
-      guard let droppedString = pb.pasteboardItems![0].string(forType: "public.utf8-plain-text") else {
+    } else if types.contains(.string) {
+      guard let droppedString = pb.pasteboardItems![0].string(forType: NSPasteboard.PasteboardType(rawValue: "public.utf8-plain-text")) else {
         return false
       }
       if Regex.urlDetect.matches(droppedString) {
@@ -167,7 +167,7 @@ class InitialWindowViewActionButton: NSView {
   private let hoverBackground = CGColor(gray: 0, alpha: 0.25)
   private let pressedBackground = CGColor(gray: 0, alpha: 0.35)
 
-  private let openFileBtnID = "openFile"
+  private let openFileBtnID = NSUserInterfaceItemIdentifier("openFile")
   private let openURLBtnID = "openURL"
 
   var action: Selector?

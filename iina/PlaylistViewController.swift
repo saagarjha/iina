@@ -13,8 +13,8 @@ fileprivate let FilenameMinLength = 12
 
 class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, NSMenuDelegate, SidebarViewController {
 
-  override var nibName: String {
-    return "PlaylistViewController"
+  override var nibName: NSNib.Name {
+    return NSNib.Name("PlaylistViewController")
   }
 
   weak var mainWindow: MainWindowController! {
@@ -91,14 +91,14 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
     playlistTableView.target = self
     
     // register for drag and drop
-    playlistTableView.register(forDraggedTypes: [IINAPlaylistIndexes, NSFilenamesPboardType])
+    playlistTableView.registerForDraggedTypes([NSPasteboard.PasteboardType(IINAPlaylistIndexes), NSFilenamesPboardType])
   }
 
   override func viewDidAppear() {
     reloadData(playlist: true, chapters: true)
 
     let loopStatus = playerCore.mpvController.getString(MPVOption.PlaybackControl.loopPlaylist)
-    loopBtn.state = (loopStatus == "inf" || loopStatus == "force") ? NSOnState : NSOffState
+    loopBtn.state = (loopStatus == "inf" || loopStatus == "force") ? .onState : .offState
   }
 
   deinit {
@@ -165,14 +165,14 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
   func tableView(_ tableView: NSTableView, writeRowsWith rowIndexes: IndexSet, to pboard: NSPasteboard) -> Bool {
     let indexesData = NSKeyedArchiver.archivedData(withRootObject: rowIndexes)
     let filePaths = rowIndexes.map { playerCore.info.playlist[$0].filename }
-    pboard.declareTypes([IINAPlaylistIndexes, NSFilenamesPboardType], owner: tableView)
-    pboard.setData(indexesData, forType: IINAPlaylistIndexes)
+    pboard.declareTypes([NSPasteboard.PasteboardType(IINAPlaylistIndexes), NSFilenamesPboardType], owner: tableView)
+    pboard.setData(indexesData, forType: NSPasteboard.PasteboardType(IINAPlaylistIndexes))
     pboard.setPropertyList(filePaths, forType: NSFilenamesPboardType)
     return true
   }
 
 
-  func tableView(_ tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int, proposedDropOperation dropOperation: NSTableViewDropOperation) -> NSDragOperation {
+  func tableView(_ tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int, proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
     let pasteboard = info.draggingPasteboard()
 
     playlistTableView.setDropRow(row, dropOperation: .above)
@@ -191,11 +191,11 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
     return []
   }
 
-  func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableViewDropOperation) -> Bool {
+  func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
     let pasteboard = info.draggingPasteboard()
 
     if info.draggingSource() as? NSTableView === tableView {
-      if let rowData = pasteboard.data(forType: IINAPlaylistIndexes) {
+      if let rowData = pasteboard.data(forType: NSPasteboard.PasteboardType(IINAPlaylistIndexes)) {
         let indexSet = NSKeyedUnarchiver.unarchiveObject(with: rowData) as! IndexSet
 
         let playlistCount = playerCore.info.playlist.count
@@ -302,7 +302,7 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
   }
 
   
-  func performDoubleAction(sender: AnyObject) {
+  @objc func performDoubleAction(sender: AnyObject) {
     let tv = sender as! NSTableView
     if tv.numberOfSelectedRows > 0 {
       playerCore.playFileInPlaylist(tv.selectedRow)
@@ -341,7 +341,7 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
   func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
     guard let identifier = tableColumn?.identifier else { return nil }
     let info = playerCore.info
-    let v = tableView.make(withIdentifier: identifier, owner: self) as! NSTableCellView
+    let v = tableView.makeView(withIdentifier: identifier, owner: self) as! NSTableCellView
 
     // playlist
     if tableView == playlistTableView {
@@ -492,7 +492,7 @@ class PlaylistViewController: NSViewController, NSTableViewDataSource, NSTableVi
       urls.append(URL(fileURLWithPath: playerCore.info.playlist[index].filename))
     }
     playlistTableView.deselectAll(nil)
-    NSWorkspace.shared().activateFileViewerSelecting(urls)
+    NSWorkspace.shared.activateFileViewerSelecting(urls)
   }
 
   @IBAction func contextMenuAddSubtitle(_ sender: NSMenuItem) {
@@ -597,7 +597,7 @@ class PlaylistView: NSView {
 
   override func resetCursorRects() {
     let rect = NSRect(x: frame.origin.x - 4, y: frame.origin.y, width: 4, height: frame.height)
-    addCursorRect(rect, cursor: NSCursor.resizeLeftRight())
+    addCursorRect(rect, cursor: .resizeLeftRight)
   }
 
 }
