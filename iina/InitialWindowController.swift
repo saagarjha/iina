@@ -51,15 +51,12 @@ class InitialWindowController: NSWindowController {
 
   override func windowDidLoad() {
     super.windowDidLoad()
-    window?.appearance = NSAppearance(named: .vibrantDark)
-    window?.titlebarAppearsTransparent = true
+    observeValue(forKeyPath: nil, of: nil, change: nil, context: nil)
     window?.isMovableByWindowBackground = true
 
     window?.contentView?.registerForDraggedTypes([.nsFilenames, .nsURL, .string])
 
     mainView.wantsLayer = true
-    mainView.layer?.backgroundColor = CGColor(gray: 0.1, alpha: 1)
-    appIcon.image = NSApp.applicationIconImage
 
     let (version, build) = Utility.iinaVersion()
     let isStableRelease = !version.contains("-")
@@ -70,10 +67,15 @@ class InitialWindowController: NSWindowController {
 
     recentFilesTableView.delegate = self
     recentFilesTableView.dataSource = self
-
-    if #available(OSX 10.11, *) {
-      visualEffectView.material = .ultraDark
+    
+    if #available(macOS 10.14, *) {
+      visualEffectView.material = .underWindowBackground
     }
+    UserDefaults.standard.addObserver(self, forKeyPath: Preference.Key.themeMaterial.rawValue, options: .new, context: nil)
+  }
+  
+  deinit {
+    UserDefaults.standard.removeObserver(self, forKeyPath: Preference.Key.themeMaterial.rawValue)
   }
 
   func loadLastPlaybackInfo() {
@@ -87,7 +89,7 @@ class InitialWindowController: NSWindowController {
       lastFileContainerView.normalBackground = CGColor(gray: 1, alpha: 0.1)
       lastFileContainerView.hoverBackground = CGColor(gray: 0.5, alpha: 0.1)
       lastFileContainerView.pressedBackground = CGColor(gray: 0, alpha: 0.1)
-      lastFileIcon.image = #imageLiteral(resourceName: "history").tinted(.white)
+      lastFileIcon.image = #imageLiteral(resourceName: "history")
       lastFileNameLabel.stringValue = lastFile.lastPathComponent
       let lastPosition = Preference.double(for: .iinaLastPlayedFilePosition)
       lastPositionLabel.stringValue = VideoTime(lastPosition).stringRepresentation
@@ -103,6 +105,10 @@ class InitialWindowController: NSWindowController {
     loadLastPlaybackInfo()
     recentDocuments = NSDocumentController.shared.recentDocumentURLs.filter { $0 != lastPlaybackURL }
     recentFilesTableView.reloadData()
+  }
+  
+  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    window?.appearance = NSAppearance(Preference.enum(for: .themeMaterial) as Preference.Theme)
   }
 }
 
