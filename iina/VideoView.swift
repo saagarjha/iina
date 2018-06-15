@@ -101,4 +101,13 @@ class VideoView: NSView {
     return player.openFromPasteboard(sender)
   }
   
+  override func updateTrackingAreas() {
+    super.updateTrackingAreas()
+    let areas = trackingAreas
+    areas.forEach(removeTrackingArea)
+    areas.map {
+      NSTrackingArea(rect: self.bounds, options: $0.options, owner: $0.owner, userInfo: $0.userInfo)
+    }.forEach(addTrackingArea)
+  }
+  
 }
